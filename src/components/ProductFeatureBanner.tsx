@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
+import WishlistButton from './WishlistButton';
 
 interface ProductFeatureBannerProps {
   product: Product;
@@ -37,6 +38,7 @@ const ProductFeatureBanner: React.FC<ProductFeatureBannerProps> = ({ product }) 
             <Link to={`/product/${product.id}`}>
               <Button variant="outline">View Details</Button>
             </Link>
+            <WishlistButton product={product} showText={true} variant="outline" size="default" />
           </div>
         </div>
         <div className="md:w-1/2">

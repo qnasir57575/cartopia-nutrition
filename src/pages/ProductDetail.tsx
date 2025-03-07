@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import RatingStars from '@/components/RatingStars';
 import ProductGrid from '@/components/ProductGrid';
+import WishlistButton from '@/components/WishlistButton';
 import { 
   Alert,
   AlertTitle,
@@ -81,12 +82,15 @@ const ProductDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* Product Image */}
             <div>
-              <div className="rounded-lg overflow-hidden bg-gray-100 h-96">
+              <div className="rounded-lg overflow-hidden bg-gray-100 h-96 relative">
                 <img 
                   src={product.image} 
                   alt={product.name} 
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute top-4 left-4">
+                  <WishlistButton product={product} />
+                </div>
               </div>
             </div>
             
@@ -152,15 +156,21 @@ const ProductDetail = () => {
                   </div>
                 </div>
                 
-                <div className="flex-grow">
+                <div className="flex-grow space-x-2">
                   <Button 
                     onClick={handleAddToCart} 
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700"
                     disabled={product.stock === 0}
                   >
                     <ShoppingCart size={18} className="mr-2" />
                     Add to Cart
                   </Button>
+                  <WishlistButton 
+                    product={product} 
+                    showText={true} 
+                    variant="outline" 
+                    size="default" 
+                  />
                 </div>
               </div>
               

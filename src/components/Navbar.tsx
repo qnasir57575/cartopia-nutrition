@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '@/context/CartContext';
-import { ShoppingCart, Menu, X } from 'lucide-react';
+import { useWishlist } from '@/context/WishlistContext';
+import { ShoppingCart, Menu, X, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navbar: React.FC = () => {
   const { totalItems } = useCart();
+  const { totalWishlistItems } = useWishlist();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   return (
@@ -25,6 +27,17 @@ const Navbar: React.FC = () => {
             <Link to="/products" className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium">Products</Link>
             <Link to="/about" className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium">About</Link>
             
+            <Link to="/wishlist" className="relative">
+              <Button variant="outline" size="icon" className="ml-2 relative">
+                <Heart size={20} />
+                {totalWishlistItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                    {totalWishlistItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
+            
             <Link to="/cart" className="relative">
               <Button variant="outline" size="icon" className="ml-2 relative">
                 <ShoppingCart size={20} />
@@ -39,6 +52,17 @@ const Navbar: React.FC = () => {
           
           {/* Mobile menu button */}
           <div className="flex md:hidden items-center">
+            <Link to="/wishlist" className="relative mr-2">
+              <Button variant="outline" size="icon" className="relative">
+                <Heart size={20} />
+                {totalWishlistItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                    {totalWishlistItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
+            
             <Link to="/cart" className="relative mr-4">
               <Button variant="outline" size="icon" className="relative">
                 <ShoppingCart size={20} />

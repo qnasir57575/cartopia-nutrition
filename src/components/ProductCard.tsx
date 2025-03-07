@@ -6,6 +6,7 @@ import RatingStars from './RatingStars';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { ShoppingCart } from 'lucide-react';
+import WishlistButton from './WishlistButton';
 
 interface ProductCardProps {
   product: Product;
@@ -28,6 +29,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               Featured
             </div>
           )}
+          <div className="absolute top-2 left-2">
+            <WishlistButton product={product} />
+          </div>
         </div>
       </Link>
       

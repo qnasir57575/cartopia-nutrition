@@ -67,3 +67,8 @@ export interface PaymentMethod {
   lastFour?: string;
   expiryDate?: string;
 }
+
+export interface WishlistItem {
+  product: Product;
+  addedAt: string;
+}
