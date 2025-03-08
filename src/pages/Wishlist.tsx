@@ -16,15 +16,20 @@ const Wishlist: React.FC = () => {
       <Navbar />
       
       <main className="flex-grow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mb-8 flex items-center"
+            transition={{ duration: 0.5 }}
+            className="mb-10"
           >
-            <Heart className="text-green-600 mr-2" size={24} />
-            <h1 className="text-3xl font-bold text-gray-900">My Wishlist</h1>
+            <div className="flex items-center mb-4">
+              <Heart className="text-primary mr-3" size={28} />
+              <h1 className="text-4xl font-bold text-gray-900">My Wishlist</h1>
+            </div>
+            <p className="text-gray-600 max-w-3xl">
+              Keep track of all the products you love and want to purchase later. Add items to your wishlist while you shop and they'll be saved here.
+            </p>
           </motion.div>
           
           {wishlist.length > 0 ? (
