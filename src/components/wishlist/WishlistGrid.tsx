@@ -94,7 +94,7 @@ const WishlistGrid: React.FC<WishlistGridProps> = ({ items }) => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
               layout
             >
-              <WishlistItemCard item={item} />
+              <WishlistItemCard product={item.product} />
             </motion.div>
           ))}
         </AnimatePresence>
