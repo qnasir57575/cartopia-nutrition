@@ -5,7 +5,7 @@ import { WishlistItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
-import { ShoppingCart, Trash, ExternalLink, Clock, BadgeCheck } from 'lucide-react';
+import { ShoppingCart, Trash, ExternalLink, Clock, BadgeCheck, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import RatingStars from '../RatingStars';
 import { useToast } from '@/hooks/use-toast';
@@ -146,7 +146,7 @@ const WishlistItemCard: React.FC<WishlistItemCardProps> = ({ item }) => {
           
           {product.stock > 0 && product.stock <= 5 && (
             <div className="mt-3 text-xs flex items-center text-amber-600">
-              <AlertCircle size={14} className="mr-1" />
+              <AlertTriangle size={14} className="mr-1" />
               Only {product.stock} items left in stock
             </div>
           )}
