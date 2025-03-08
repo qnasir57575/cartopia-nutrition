@@ -1,7 +1,6 @@
-
 import React from 'react';
+import { Product } from '@/lib/types';
 import { Link } from 'react-router-dom';
-import { WishlistItem } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -11,152 +10,88 @@ import RatingStars from '../RatingStars';
 import { useToast } from '@/hooks/use-toast';
 
 interface WishlistItemCardProps {
-  item: WishlistItem;
+  product: Product;
 }
 
-const WishlistItemCard: React.FC<WishlistItemCardProps> = ({ item }) => {
-  const { addToCart } = useCart();
+const WishlistItemCard: React.FC<WishlistItemCardProps> = ({ product }) => {
   const { removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const { toast } = useToast();
-  const { product } = item;
-  
-  const handleAddToCart = () => {
-    addToCart(product, 1);
-    toast({
-      title: "Added to cart",
-      description: `${product.name} has been added to your cart`,
-      duration: 3000,
-    });
-  };
-  
-  const handleRemove = () => {
+
+  const handleRemoveFromWishlist = () => {
     removeFromWishlist(product.id);
     toast({
       title: "Removed from wishlist",
-      description: `${product.name} has been removed from your wishlist`,
-      duration: 3000,
-    });
+      description: `${product.name} has been removed from your wishlist.`,
+    })
   };
-  
-  const formattedDate = new Date(item.addedAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-  
+
+  const handleAddToCart = () => {
+    addToCart(product, 1);
+    removeFromWishlist(product.id);
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart and removed from your wishlist.`,
+    })
+  };
+
   return (
     <motion.div
-      layout
-      className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-300"
-      whileHover={{ y: -5 }}
+      className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.2 }}
     >
-      <div className="flex flex-col sm:flex-row">
-        <div className="sm:w-60 h-60 relative group overflow-hidden">
-          <Link to={`/product/${product.id}`}>
-            <motion.img 
-              src={product.image} 
-              alt={product.name} 
-              className="w-full h-full object-cover"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.4 }}
-            />
-          </Link>
-          {product.stock <= 0 && (
-            <div className="absolute top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center">
-              <span className="bg-red-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold">
-                Out of Stock
-              </span>
-            </div>
-          )}
+      <div className="p-4">
+        <Link to={`/product/${product.id}`} className="hover:underline">
+          <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
+        </Link>
+        <div className="flex items-center mt-2">
+          <RatingStars rating={product.rating} />
+          <span className="text-gray-600 ml-2">({product.rating.toFixed(1)})</span>
         </div>
-        
-        <div className="p-6 flex-grow">
-          <div className="flex justify-between items-start">
-            <div>
-              <Link to={`/product/${product.id}`}>
-                <h3 className="text-xl font-semibold text-gray-900 hover:text-primary transition-colors group flex items-center gap-1">
-                  {product.name}
-                  <ExternalLink size={16} className="inline opacity-0 group-hover:opacity-100 transition-opacity" />
-                </h3>
-              </Link>
-              
-              <div className="flex items-center mt-2 mb-3">
-                <RatingStars rating={product.rating} size={16} />
-                <span className="ml-2 text-sm text-gray-500">
-                  {product.reviews.length} {product.reviews.length === 1 ? 'review' : 'reviews'}
-                </span>
-              </div>
-            </div>
-            
-            <div className="text-xl font-bold text-primary">
-              ${product.price.toFixed(2)}
+      </div>
+
+      <div className="relative">
+        <Link to={`/product/${product.id}`}>
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-48 object-cover"
+          />
+        </Link>
+        {product.stock === 0 && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <div className="text-white font-bold text-xl flex items-center">
+              <AlertTriangle size={20} className="mr-2" />
+              Out of Stock
             </div>
           </div>
-          
-          <p className="text-sm text-gray-600 mb-5 line-clamp-2">
-            {product.description}
-          </p>
-          
-          <div className="flex flex-wrap justify-between items-center">
-            <div className="text-xs text-gray-500 mb-3 sm:mb-0 flex items-center">
-              <Clock size={14} className="mr-1" />
-              Added on {formattedDate}
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  variant="outline" 
-                  size="sm" 
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-100"
-                  onClick={handleRemove}
-                >
-                  <Trash size={16} className="mr-1" />
-                  Remove
-                </Button>
-              </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button 
-                  size="sm"
-                  className="bg-primary hover:bg-primary/90"
-                  onClick={handleAddToCart}
-                  disabled={product.stock === 0}
-                >
-                  {product.stock > 0 ? (
-                    <>
-                      <ShoppingCart size={16} className="mr-1" />
-                      Add to Cart
-                    </>
-                  ) : (
-                    <>
-                      Out of Stock
-                    </>
-                  )}
-                </Button>
-              </motion.div>
-            </div>
-          </div>
-          
-          {product.stock > 0 && product.stock <= 5 && (
-            <div className="mt-3 text-xs flex items-center text-amber-600">
-              <AlertTriangle size={14} className="mr-1" />
-              Only {product.stock} items left in stock
-            </div>
-          )}
-          
-          {product.stock > 5 && (
-            <div className="mt-3 text-xs flex items-center text-green-600">
-              <BadgeCheck size={14} className="mr-1" />
-              In stock and ready to ship
-            </div>
-          )}
+        )}
+      </div>
+
+      <div className="p-4 flex flex-col justify-between flex-grow">
+        <div>
+          <p className="text-gray-700">${product.price.toFixed(2)}</p>
+        </div>
+        <div className="flex justify-between items-center mt-4">
+          <Button
+            onClick={handleAddToCart}
+            disabled={product.stock === 0}
+            className="bg-primary hover:bg-primary/90 text-white rounded-full text-sm px-4 py-2"
+          >
+            <ShoppingCart size={16} className="mr-2" />
+            Add to Cart
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleRemoveFromWishlist}
+            className="hover:text-red-600"
+          >
+            <Trash size={16} className="mr-2" />
+            Remove
+          </Button>
         </div>
       </div>
     </motion.div>
