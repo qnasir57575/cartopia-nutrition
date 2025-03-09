@@ -1,16 +1,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+import { User } from '@/lib/types';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
@@ -26,6 +22,13 @@ const MOCK_USERS = [
     email: 'user@example.com',
     name: 'Demo User',
     password: 'password123'
+  },
+  {
+    id: '2',
+    email: 'admin@example.com',
+    name: 'Admin User',
+    password: 'admin123',
+    isAdmin: true
   }
 ];
 
@@ -73,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       toast({
         title: "Login failed",
-        description: "Invalid email or password. Try user@example.com / password123",
+        description: "Invalid email or password. Try user@example.com / password123 or admin@example.com / admin123",
         variant: "destructive",
       });
       throw new Error('Invalid credentials');
@@ -130,6 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{ 
         user, 
         isAuthenticated: !!user,
+        isAdmin: !!user?.isAdmin,
         isLoading,
         login, 
         register, 

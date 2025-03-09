@@ -1,118 +1,290 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
-import { ShoppingCart, Menu, X, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  ShoppingCart,
+  Heart,
+  User,
+  Menu,
+  X,
+  Search,
+  LogIn,
+  ShieldCheck
+} from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import AuthModal from './auth/AuthModal';
+import { useMobile } from '@/hooks/use-mobile';
 
 const Navbar: React.FC = () => {
-  const { totalItems } = useCart();
-  const { totalWishlistItems } = useWishlist();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, user, logout, isAdmin } = useAuth();
+  const { cartItems } = useCart();
+  const location = useLocation();
+  const [navOpen, setNavOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const isMobile = useMobile();
+  
+  const navItems = [
+    { path: '/', label: 'Home' },
+    { path: '/products', label: 'Products' },
+    { path: '/about', label: 'About' },
+  ];
+  
+  const cartItemsCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  
+  const toggleNav = () => {
+    setNavOpen(!navOpen);
+  };
+  
+  const closeNav = () => {
+    setNavOpen(false);
+  };
   
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-green-600">typecabNutrition</span>
-            </Link>
-          </div>
+    <>
+      <header className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white">
+        <div className="container px-4 mx-auto flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center text-2xl font-bold text-gray-900" onClick={closeNav}>
+            typecab<span className="text-green-600">Nutrition</span>
+          </Link>
           
-          {/* Desktop menu */}
-          <div className="hidden md:flex md:items-center md:space-x-6">
-            <Link to="/" className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium">Home</Link>
-            <Link to="/products" className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium">Products</Link>
-            <Link to="/about" className="text-gray-700 hover:text-green-600 px-3 py-2 text-sm font-medium">About</Link>
-            
-            <Link to="/wishlist" className="relative">
-              <Button variant="outline" size="icon" className="ml-2 relative">
-                <Heart size={20} />
-                {totalWishlistItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    {totalWishlistItems}
-                  </span>
-                )}
-              </Button>
-            </Link>
-            
-            <Link to="/cart" className="relative">
-              <Button variant="outline" size="icon" className="ml-2 relative">
-                <ShoppingCart size={20} />
-                {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    {totalItems}
-                  </span>
-                )}
-              </Button>
-            </Link>
-          </div>
+          {/* Mobile Nav Toggle */}
+          <button
+            className="md:hidden flex items-center text-gray-500 hover:text-gray-700"
+            onClick={toggleNav}
+            aria-label="Toggle menu"
+          >
+            {navOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
           
-          {/* Mobile menu button */}
-          <div className="flex md:hidden items-center">
-            <Link to="/wishlist" className="relative mr-2">
-              <Button variant="outline" size="icon" className="relative">
-                <Heart size={20} />
-                {totalWishlistItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    {totalWishlistItems}
-                  </span>
-                )}
-              </Button>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`text-sm font-medium transition-colors ${
+                  location.pathname === item.path
+                    ? 'text-green-600'
+                    : 'text-gray-700 hover:text-green-600'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+            
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="text-sm font-medium text-gray-700 hover:text-green-600 transition-colors flex items-center"
+              >
+                <ShieldCheck size={16} className="mr-1"/>
+                Admin
+              </Link>
+            )}
+          </nav>
+          
+          {/* Desktop Right Section */}
+          <div className="hidden md:flex items-center space-x-1">
+            <Link to="/wishlist" className="p-2 text-gray-700 hover:text-green-600 transition-colors relative">
+              <Heart size={20} />
             </Link>
             
-            <Link to="/cart" className="relative mr-4">
-              <Button variant="outline" size="icon" className="relative">
-                <ShoppingCart size={20} />
-                {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                    {totalItems}
-                  </span>
-                )}
-              </Button>
+            <Link to="/cart" className="p-2 text-gray-700 hover:text-green-600 transition-colors relative">
+              <ShoppingCart size={20} />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              )}
             </Link>
             
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-600 focus:outline-none"
-            >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <User size={20} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col">
+                      <span>{user?.name}</span>
+                      <span className="text-xs text-gray-500">{user?.email}</span>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">My Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/orders">My Orders</Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => setAuthModalOpen(true)}>
+                <LogIn size={16} className="mr-1" />
+                Login
+              </Button>
+            )}
           </div>
         </div>
-      </div>
+      </header>
       
-      {/* Mobile menu, show/hide based on menu state */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link 
-              to="/" 
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link 
-              to="/products" 
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Products
-            </Link>
-            <Link 
-              to="/about" 
-              className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-green-600"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About
-            </Link>
+      {/* Mobile Navigation Overlay */}
+      {navOpen && (
+        <div className="fixed inset-0 z-30 bg-white md:hidden overflow-y-auto">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex justify-between items-center mb-6">
+              <Link to="/" className="text-2xl font-bold text-gray-900" onClick={closeNav}>
+                typecab<span className="text-green-600">Nutrition</span>
+              </Link>
+              <button
+                className="text-gray-500 hover:text-gray-700"
+                onClick={toggleNav}
+                aria-label="Close menu"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="py-4">
+              <div className="relative mb-6">
+                <Input
+                  type="text"
+                  placeholder="Search products..."
+                  className="pl-10"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              </div>
+              
+              <nav className="space-y-4">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`block text-lg font-medium py-2 border-b border-gray-100 ${
+                      location.pathname === item.path
+                        ? 'text-green-600'
+                        : 'text-gray-700'
+                    }`}
+                    onClick={closeNav}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="block text-lg font-medium py-2 border-b border-gray-100 text-gray-700 flex items-center"
+                    onClick={closeNav}
+                  >
+                    <ShieldCheck size={18} className="mr-2"/>
+                    Admin Dashboard
+                  </Link>
+                )}
+              </nav>
+              
+              <div className="mt-6 space-y-4">
+                <div className="flex items-center justify-between border-b border-gray-100 py-2">
+                  <Link 
+                    to="/wishlist" 
+                    className="flex items-center text-gray-700"
+                    onClick={closeNav}
+                  >
+                    <Heart size={20} className="mr-3" />
+                    <span className="text-lg font-medium">Wishlist</span>
+                  </Link>
+                </div>
+                
+                <div className="flex items-center justify-between border-b border-gray-100 py-2">
+                  <Link 
+                    to="/cart" 
+                    className="flex items-center text-gray-700"
+                    onClick={closeNav}
+                  >
+                    <ShoppingCart size={20} className="mr-3" />
+                    <span className="text-lg font-medium">Cart</span>
+                  </Link>
+                  {cartItemsCount > 0 && (
+                    <span className="bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                </div>
+                
+                {isAuthenticated ? (
+                  <div className="pt-4">
+                    <p className="font-medium">{user?.name}</p>
+                    <p className="text-sm text-gray-500 mb-4">{user?.email}</p>
+                    <div className="space-y-3">
+                      <Link 
+                        to="/profile" 
+                        className="block text-gray-700 py-1"
+                        onClick={closeNav}
+                      >
+                        My Profile
+                      </Link>
+                      <Link 
+                        to="/orders" 
+                        className="block text-gray-700 py-1"
+                        onClick={closeNav}
+                      >
+                        My Orders
+                      </Link>
+                      <button
+                        className="block text-red-600 py-1"
+                        onClick={() => {
+                          logout();
+                          closeNav();
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button 
+                    className="w-full mt-4 bg-green-600 hover:bg-green-700"
+                    onClick={() => {
+                      setAuthModalOpen(true);
+                      closeNav();
+                    }}
+                  >
+                    <LogIn size={16} className="mr-1" />
+                    Login / Register
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
-    </nav>
+      
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
+    </>
   );
 };
 
